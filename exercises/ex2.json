@@ -1,0 +1,12 @@
+{
+  "title": "Exercice 2 - Répétition de Mi grave",
+  "description": "Joue la corde de Mi grave (E) plusieurs fois de suite.",
+  "notes": [
+    { "string": "E", "time": 0 },
+    { "string": "E", "time": 1.2 },
+    { "string": "E", "time": 2.4 },
+    { "string": "E", "time": 3.6 },
+    { "string": "E", "time": 4.8 },
+    { "string": "E", "time": 6.0 }
+  ]
+}

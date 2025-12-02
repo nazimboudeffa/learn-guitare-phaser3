@@ -1,0 +1,12 @@
+{
+  "title": "Exercice 1 - Gamme de Mi",
+  "description": "Joue la gamme de Mi sur chaque corde ouverte.",
+  "notes": [
+    { "string": "E", "time": 0 },
+    { "string": "A", "time": 1.6 },
+    { "string": "D", "time": 3.2 },
+    { "string": "G", "time": 4.8 },
+    { "string": "B", "time": 6.4 },
+    { "string": "e", "time": 8.0 }
+  ]
+}
