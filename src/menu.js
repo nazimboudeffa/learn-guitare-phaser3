@@ -7,27 +7,27 @@ export default class MenuScene extends Phaser.Scene {
 
   preload() {
     // Load all exercises in the folder (for now, hardcoded)
-    this.load.json('ex1', 'exercises/ex1.json');
-    this.load.json('ex2', 'exercises/ex2.json');
+    this.load.json('ex1', '/exercises/ex1.json');
+    this.load.json('ex2', '/exercises/ex2.json');
   }
 
-  async create() {
+  create() {
     // Microphone activation overlay
-    if (!globalThis.guitarAudioController) {
-      const overlay = document.createElement("div");
-      overlay.style.cssText = `
-        position:fixed;top:0;left:0;width:100vw;height:100vh;
-        display:flex;align-items:center;justify-content:center;
-        z-index:1000;background:rgba(0,0,0,0.5);
-        font-size:1.5rem;color:white;
-      `;
-      overlay.innerHTML = `<div style="text-align:center">
-        <div style="margin-bottom:12px">Clique pour activer le micro et démarrer</div>
-        <div style="font-size:0.9rem;opacity:0.9">Conseil : utilise une guitare acoustique ou électrique avec un manche confortable</div>
-      </div>`;
-      document.body.appendChild(overlay);
+    const activateMic = () => {
+      if (!globalThis.guitarAudioController) {
+        const overlay = document.createElement("div");
+        overlay.style.cssText = `
+          position:fixed;top:0;left:0;width:100vw;height:100vh;
+          display:flex;align-items:center;justify-content:center;
+          z-index:1000;background:rgba(0,0,0,0.5);
+          font-size:1.5rem;color:white;
+        `;
+        overlay.innerHTML = `<div style="text-align:center">
+          <div style="margin-bottom:12px">Clique pour activer le micro et démarrer</div>
+          <div style="font-size:0.9rem;opacity:0.9">Conseil : utilise une guitare acoustique ou électrique avec un manche confortable</div>
+        </div>`;
+        document.body.appendChild(overlay);
 
-      await new Promise(resolve => {
         overlay.addEventListener("click", async () => {
           overlay.remove();
           try {
@@ -42,13 +42,14 @@ export default class MenuScene extends Phaser.Scene {
             `;
             document.body.appendChild(okText);
             setTimeout(() => okText.remove(), 2000);
-            resolve();
           } catch (err) {
             alert("Erreur audio: " + err.message);
           }
         });
-      });
-    }
+      }
+    };
+
+    activateMic();
 
     this.add.text(400, 80, "Guitar Learner", { fontSize: "32px", color: "#fff" }).setOrigin(0.5);
     this.add.text(400, 140, "Choisis un exercice :", { fontSize: "20px", color: "#fff" }).setOrigin(0.5);
@@ -59,7 +60,9 @@ export default class MenuScene extends Phaser.Scene {
       { key: 'ex2', data: this.cache.json.get('ex2') }
     ];
 
-    exercises.forEach((ex, i) => {
+    for (let i = 0; i < exercises.length; i++) {
+      const ex = exercises[i];
+      if (!ex.data) continue; // skip if not loaded
       const y = 200 + i * 60;
       const btn = this.add.text(400, y, ex.data.title, {
         fontSize: "22px", color: "#00bfff", backgroundColor: "#222", padding: { left: 12, right: 12, top: 6, bottom: 6 }
@@ -69,6 +72,6 @@ export default class MenuScene extends Phaser.Scene {
         this.scene.start('GuitarScene', { exerciseKey: ex.key });
       });
       this.add.text(400, y + 24, ex.data.description, { fontSize: "14px", color: "#aaa" }).setOrigin(0.5);
-    });
+    }
   }
 }
