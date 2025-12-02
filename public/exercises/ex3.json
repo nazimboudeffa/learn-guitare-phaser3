@@ -1,0 +1,12 @@
+{
+  "title": "Exercice 3 - Espacement lent",
+  "description": "Joue chaque corde ouverte avec un grand intervalle de temps.",
+  "notes": [
+    { "string": "E", "time": 0 },
+    { "string": "A", "time": 3 },
+    { "string": "D", "time": 6 },
+    { "string": "G", "time": 9 },
+    { "string": "B", "time": 12 },
+    { "string": "e", "time": 15 }
+  ]
+}

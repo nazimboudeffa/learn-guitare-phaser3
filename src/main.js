@@ -1,7 +1,9 @@
 import Phaser from "phaser";
+import SplashScene from "./splash.js";
 import MenuScene from "./menu.js";
 import GuitarScene from "./scene.js";
 import StatsScene from "./stats.js";
+import ChordScene from "./chord.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -9,7 +11,7 @@ const config = {
   height: 600,
   backgroundColor: "#111111",
   parent: "game-container",
-  scene: [MenuScene, GuitarScene, StatsScene],
+  scene: [SplashScene, MenuScene, ChordScene, GuitarScene, StatsScene],
   // scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH }
 };
 

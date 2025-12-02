@@ -1,0 +1,13 @@
+{
+  "title": "Exercice frettes simples",
+  "description": "Joue les notes sur les frettes indiquées.",
+  "notes": [
+    { "string": "E", "fret": 0, "time": 0 },
+    { "string": "E", "fret": 3, "time": 2 },
+    { "string": "A", "fret": 2, "time": 4 },
+    { "string": "D", "fret": 0, "time": 6 },
+    { "string": "G", "fret": 2, "time": 8 },
+    { "string": "B", "fret": 1, "time": 10 },
+    { "string": "e", "fret": 0, "time": 12 }
+  ]
+}

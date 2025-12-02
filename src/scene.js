@@ -16,7 +16,7 @@ const STRING_NOTES = [
   { name: "e", freq: 329.63 }
 ];
 
-function freqToStringName(freq) {
+export function freqToStringName(freq) {
   if (!freq || freq <= 0) return null;
   let closest = STRING_NOTES[0];
   let minDiff = Math.abs(freq - closest.freq);
@@ -59,6 +59,8 @@ export default class GuitarScene extends Phaser.Scene {
     this.exerciseNotes = this.exercise.notes || [];
     this.exerciseIndex = 0;
     this.exerciseStartTime = null;
+    // Detect if exercise uses frets
+    this.usesFrets = this.exerciseNotes.some(n => typeof n.fret === 'number');
 
     // draw lines + labels
     for (let i = 0; i < 6; i++) {
@@ -119,13 +121,13 @@ export default class GuitarScene extends Phaser.Scene {
     }
 
     // Check for notes in target zone
-    const notesInZone = this.notesGroup.getChildren().filter(note => note.x > 130 && note.x < 170 && !note.hit);
+    const notesInZone = this.notesGroup.getChildren().filter(container => container.x > 130 && container.x < 170 && !container.hit);
     if (notesInZone.length > 0) {
       // Try to match played note with any note in zone
-      const matchedNote = notesInZone.find(note => note.noteName === played);
+      const matchedNote = notesInZone.find(container => container.noteName === played);
       if (matchedNote) {
         matchedNote.hit = true;
-        matchedNote.setFillStyle(0x00ff00); // green for hit
+        if (matchedNote.circle && matchedNote.circle.setFillStyle) matchedNote.circle.setFillStyle(0x00ff00); // green for hit
         this.stats.success++;
         this.feedback?.setText?.(`Bravo ! Note ${played} réussie (clarité ${Math.round(clarity * 100)}%)`);
         this.time.delayedCall(400, () => matchedNote.destroy());
@@ -143,10 +145,21 @@ export default class GuitarScene extends Phaser.Scene {
 
   update(time, delta) {
     // move notes left and check if in target zone
-    for (const note of this.notesGroup.getChildren()) {
-      note.x -= delta * 0.22;
-      note.isInTargetZone = note.x > 130 && note.x < 170;
-      if (note.x < -40) note.destroy();
+    for (const container of this.notesGroup.getChildren()) {
+      let speed = 0.12; // vitesse normale
+      if (container.length && container.length > 1.2) {
+        speed *= 0.5;  // les notes longues vont 2x moins vite
+      }
+      container.x -= delta * speed;
+      container.isInTargetZone = container.x > 130 && container.x < 170;
+      // If note leaves the screen and was not hit, count as missed ONCE
+      if (container.x < -40) {
+        if (!container.hit && !container.missed) {
+          container.missed = true;
+          this.stats.fail++;
+        }
+        container.destroy();
+      }
     }
 
     // Exercise timing
@@ -160,7 +173,8 @@ export default class GuitarScene extends Phaser.Scene {
       this.exerciseIndex < this.exerciseNotes.length &&
       elapsed >= this.exerciseNotes[this.exerciseIndex].time
     ) {
-      this.spawnNote(this.exerciseNotes[this.exerciseIndex].string);
+      const noteObj = this.exerciseNotes[this.exerciseIndex];
+      this.spawnNote(noteObj.string, noteObj.fret, noteObj.length ?? 1);
       this.exerciseIndex++;
     }
 
@@ -194,18 +208,71 @@ export default class GuitarScene extends Phaser.Scene {
     });
   }
 
-  spawnNote(noteName) {
-    // Find note type by name
+  spawnNote(noteName, fret = null, length = 1) {
     const idx = this.noteTypes.findIndex(n => n.name === noteName);
     const noteType = this.noteTypes[idx];
     if (!noteType) return;
 
-    const note = this.add.circle(900, this.targetY[idx], 18, noteType.color).setStrokeStyle(2, 0xffffff);
-    note.noteName = noteType.name;
-    note.hit = false;
-    this.notesGroup.add(note);
+    // Couleur du doigt
+    let color = 0x888888; // défaut gris
+    if (typeof fret === 'number') {
+      if (fret === 1) color = 0xffeb3b;
+      else if (fret === 2) color = 0x9c27b0;
+      else if (fret === 3) color = 0x2196f3;
+      else if (fret >= 4) color = 0xf44336;
+    }
 
-    // update expected note (the next note that should be played)
+    // Gestion si noteName est un objet
+    if (typeof noteName === 'object' && noteName !== null) {
+      fret = noteName.fret ?? fret;
+      length = noteName.length ?? length;
+      noteName = noteName.string;
+    }
+
+    // Container pour note
+    const container = this.add.container(900, this.targetY[idx]);
+
+    // -------------------------------
+    // Queue de la note
+    // -------------------------------
+    const baseHeight = 36;
+    const baseWidth = 20; // tête
+    const queueWidth = baseWidth * length; // queue proportionnelle à length
+
+    // Queue : rectangle fin
+    const queue = this.add.rectangle(queueWidth / 2, 0, queueWidth, baseHeight / 3, color)
+      .setOrigin(0.5, 0.5)
+      .setAlpha(0.6); // légèrement transparent
+
+    // Tête de la note : cercle
+    const head = this.add.circle(0, 0, baseHeight / 2, color)
+      .setStrokeStyle(2, 0xffffff);
+
+    container.add([queue, head]);
+
+    // -------------------------------
+    // Texte de frette au-dessus
+    // -------------------------------
+    if (typeof fret === 'number') {
+      const fretText = this.add.text(0, -baseHeight * 0.75, fret.toString(), {
+        fontSize: '18px',
+        color: '#fff',
+        fontStyle: 'bold'
+      }).setOrigin(0.5);
+      container.add(fretText);
+    }
+
+    // -------------------------------
+    // Données utiles
+    // -------------------------------
+    container.noteName = noteType.name;
+    container.fret = fret;
+    container.noteLength = length;
+    container.hit = false;
+    container.head = head;
+    container.queue = queue;
+
+    this.notesGroup.add(container);
     this.currentTargetNote = noteType.name;
   }
 

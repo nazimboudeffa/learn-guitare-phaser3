@@ -1,0 +1,27 @@
+{
+  "title": "River Flow",
+  "description": "Chanson d'entraînement avec de longues notes (ovales) bien visibles.",
+  "notes": [
+
+    { "string": "E", "fret": 0, "time": 0,   "length": 3 },
+    { "string": "E", "fret": 3, "time": 3.2, "length": 1 },
+
+    { "string": "A", "fret": 2, "time": 4.4, "length": 2 },
+    { "string": "A", "fret": 0, "time": 6.4, "length": 1 },
+
+    { "string": "D", "fret": 0, "time": 7.6, "length": 3 },
+    { "string": "G", "fret": 2, "time": 10.8, "length": 1 },
+
+    { "string": "B", "fret": 1, "time": 12.0, "length": 2 },
+    { "string": "e", "fret": 0, "time": 14.0, "length": 3 },
+
+    { "string": "e", "fret": 3, "time": 17.2, "length": 2 },
+    { "string": "B", "fret": 0, "time": 19.2, "length": 3 },
+
+    { "string": "G", "fret": 0, "time": 22.4, "length": 2 },
+    { "string": "D", "fret": 2, "time": 24.4, "length": 3 },
+
+    { "string": "A", "fret": 0, "time": 27.6, "length": 2 },
+    { "string": "E", "fret": 0, "time": 29.6, "length": 3 }
+  ]
+}

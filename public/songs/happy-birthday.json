@@ -1,0 +1,31 @@
+{
+  "title": "Joyeux Anniversaire",
+  "description": "Version simple de Joyeux Anniversaire avec notes longues visibles",
+  "notes": [
+    { "string": "E", "fret": 0, "time": 0.0, "length": 2 },
+    { "string": "E", "fret": 0, "time": 1.0, "length": 2 },
+    { "string": "F", "fret": 1, "time": 2.0, "length": 3 },
+    { "string": "E", "fret": 0, "time": 3.5, "length": 2 },
+    { "string": "A", "fret": 0, "time": 4.5, "length": 3 },
+    { "string": "G", "fret": 0, "time": 6.0, "length": 4 },
+    
+    { "string": "E", "fret": 0, "time": 8.0, "length": 2 },
+    { "string": "E", "fret": 0, "time": 9.0, "length": 2 },
+    { "string": "F", "fret": 1, "time": 10.0, "length": 3 },
+    { "string": "E", "fret": 0, "time": 11.5, "length": 2 },
+    { "string": "B", "fret": 0, "time": 12.5, "length": 3 },
+    { "string": "A", "fret": 0, "time": 14.0, "length": 4 },
+    
+    { "string": "E", "fret": 0, "time": 16.0, "length": 2 },
+    { "string": "E", "fret": 0, "time": 17.0, "length": 2 },
+    { "string": "E", "fret": 7, "time": 18.0, "length": 3 },
+    { "string": "D", "fret": 0, "time": 19.5, "length": 2 },
+    { "string": "A", "fret": 0, "time": 20.5, "length": 3 },
+    { "string": "G", "fret": 0, "time": 22.0, "length": 4 },
+    
+    { "string": "E", "fret": 0, "time": 24.0, "length": 3 },
+    { "string": "F", "fret": 1, "time": 25.5, "length": 3 },
+    { "string": "E", "fret": 0, "time": 27.0, "length": 2 },
+    { "string": "A", "fret": 0, "time": 28.0, "length": 4 }
+  ]
+}

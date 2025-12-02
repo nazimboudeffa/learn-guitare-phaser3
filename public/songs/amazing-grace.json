@@ -1,0 +1,22 @@
+{
+  "title": "Amazing Grace - Riff avec durées",
+  "description": "Riff basé sur Amazing Grace (domaine public).",
+  "notes": [
+    { "string": "E", "fret": 0, "time": 0, "duration": 1.2 },
+    { "string": "A", "fret": 2, "time": 1.2, "duration": 1.2 },
+    { "string": "D", "fret": 2, "time": 2.4, "duration": 1.2 },
+    { "string": "G", "fret": 0, "time": 3.6, "duration": 1.4 },
+
+    { "string": "G", "fret": 2, "time": 5.0, "duration": 1.2 },
+    { "string": "B", "fret": 0, "time": 6.2, "duration": 1.2 },
+    { "string": "e", "fret": 0, "time": 7.4, "duration": 1.4 },
+
+    { "string": "e", "fret": 3, "time": 8.8, "duration": 1.2 },
+    { "string": "B", "fret": 1, "time": 10.0, "duration": 1.2 },
+    { "string": "G", "fret": 0, "time": 11.2, "duration": 1.4 },
+
+    { "string": "A", "fret": 0, "time": 12.6, "duration": 1.2 },
+    { "string": "D", "fret": 2, "time": 13.8, "duration": 1.2 },
+    { "string": "G", "fret": 0, "time": 15.0, "duration": 2.0 }
+  ]
+}

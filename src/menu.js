@@ -9,55 +9,25 @@ export default class MenuScene extends Phaser.Scene {
     // Load all exercises in the folder (for now, hardcoded)
     this.load.json('ex1', '/exercises/ex1.json');
     this.load.json('ex2', '/exercises/ex2.json');
+    this.load.json('ex3', '/exercises/ex3.json');
+    this.load.json('ex4', '/exercises/ex4.json');
+    this.load.json('amazing-grace', '/songs/amazing-grace.json');
+    this.load.json('happy-birthday', '/songs/happy-birthday.json');
   }
 
   create() {
-    // Microphone activation overlay
-    const activateMic = () => {
-      if (!globalThis.guitarAudioController) {
-        const overlay = document.createElement("div");
-        overlay.style.cssText = `
-          position:fixed;top:0;left:0;width:100vw;height:100vh;
-          display:flex;align-items:center;justify-content:center;
-          z-index:1000;background:rgba(0,0,0,0.5);
-          font-size:1.5rem;color:white;
-        `;
-        overlay.innerHTML = `<div style="text-align:center">
-          <div style="margin-bottom:12px">Clique pour activer le micro et démarrer</div>
-          <div style="font-size:0.9rem;opacity:0.9">Conseil : utilise une guitare acoustique ou électrique avec un manche confortable</div>
-        </div>`;
-        document.body.appendChild(overlay);
-
-        overlay.addEventListener("click", async () => {
-          overlay.remove();
-          try {
-            const { startAudio } = await import("./audio.js");
-            globalThis.guitarAudioController = await startAudio(() => {});
-            // Add visible feedback
-            const okText = document.createElement("div");
-            okText.textContent = "Micro activé ! (audio OK)";
-            okText.style.cssText = `
-              position:fixed;top:20px;left:50%;transform:translateX(-50%);
-              background:#222;color:#0f0;padding:12px 24px;border-radius:8px;z-index:1001;font-size:1.2rem;
-            `;
-            document.body.appendChild(okText);
-            setTimeout(() => okText.remove(), 2000);
-          } catch (err) {
-            alert("Erreur audio: " + err.message);
-          }
-        });
-      }
-    };
-
-    activateMic();
-
+    
     this.add.text(400, 80, "Guitar Learner", { fontSize: "32px", color: "#fff" }).setOrigin(0.5);
     this.add.text(400, 140, "Choisis un exercice :", { fontSize: "20px", color: "#fff" }).setOrigin(0.5);
 
     // List of exercises (for now, hardcoded)
     const exercises = [
       { key: 'ex1', data: this.cache.json.get('ex1') },
-      { key: 'ex2', data: this.cache.json.get('ex2') }
+      { key: 'ex2', data: this.cache.json.get('ex2') },
+      { key: 'ex3', data: this.cache.json.get('ex3') },
+      { key: 'ex4', data: this.cache.json.get('ex4') },
+      { key: 'amazing-grace', data: this.cache.json.get('amazing-grace') },
+      { key: 'happy-birthday', data: this.cache.json.get('happy-birthday') }
     ];
 
     for (let i = 0; i < exercises.length; i++) {
