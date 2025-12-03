@@ -12,11 +12,11 @@ const config = {
   backgroundColor: "#1b1b1b",
   scale : {
       mode: Phaser.Scale.FIT,
+      parent: "game-container",
       autoCenter: Phaser.Scale.CENTER_BOTH,
       width: 800,
       height: 600
   },
-  parent: "game-container",
   scene: [MenuScene, CoursesScene, CoursePracticeScene, ChordsScene, SongsScene, SongsPracticeScene, StatsScene],
   // scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH }
 };
