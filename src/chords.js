@@ -1,9 +1,9 @@
 import Phaser from "phaser";
 import { matchChord, noteNames } from "chord-detector";
 
-export default class ChordScene extends Phaser.Scene {
+export default class ChordsScene extends Phaser.Scene {
   constructor() {
-    super({ key: "ChordScene" });
+    super({ key: "ChordsScene" });
   }
 
   create() {

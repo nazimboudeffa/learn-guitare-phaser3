@@ -30,9 +30,9 @@ export function freqToStringName(freq) {
   return closest.name;
 }
 
-export default class GuitarScene extends Phaser.Scene {
+export default class CoursesPracticeScene extends Phaser.Scene {
   constructor() {
-    super({ key: "GuitarScene" });
+    super({ key: "CoursesPracticeScene" });
   }
 
   preload() {
