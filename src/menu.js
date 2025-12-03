@@ -11,6 +11,7 @@ export default class MenuScene extends Phaser.Scene {
     this.load.image('courses', '/assets/images/courses.png');
     this.load.image('chords', '/assets/images/chords.png');
     this.load.image('songs', '/assets/images/songs.png');
+    this.load.spritesheet('fullscreen', 'assets/ui/fullscreen.png', { frameWidth: 64, frameHeight: 64 });
   }
 
   create() {
@@ -21,6 +22,26 @@ export default class MenuScene extends Phaser.Scene {
     const coursesImage = this.add.image(200, 480, 'courses').setScale(0.7);
     const chordsImage = this.add.image(400, 480, 'chords').setScale(0.7);
     const songsImage = this.add.image(600, 480, 'songs').setScale(0.7);
+
+    const button = this.add.image(800 - 16, 16, 'fullscreen', 0).setOrigin(1, 0).setInteractive();
+
+        button.on('pointerup', function ()
+        {
+
+            if (this.scale.isFullscreen)
+            {
+                button.setFrame(0);
+
+                this.scale.stopFullscreen();
+            }
+            else
+            {
+                button.setFrame(1);
+
+                this.scale.startFullscreen();
+            }
+
+        }, this);
 
     coursesImage.setInteractive({ useHandCursor: true });
     coursesImage.on('pointerdown', () => {
