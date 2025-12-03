@@ -7,7 +7,7 @@ export default class SplashScene extends Phaser.Scene {
 
   preload() {
     // You can replace this with your own image asset
-    this.load.image('guitar', '/public/assets/images/guitare.png');
+    this.load.image('guitar', '/assets/images/guitare.png');
   }
 
   create() {
