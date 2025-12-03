@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import SplashScene from "./splash.js";
+import MenuScene from "./menu.js";
 import CoursesScene from "./courses.js";
 import CoursePracticeScene from "./courses-practice.js";
 import SongsScene from "./songs.js";
@@ -11,12 +11,15 @@ const config = {
   type: Phaser.AUTO,
   width: 800,
   height: 600,
-  backgroundColor: "#111111",
+  backgroundColor: "#1b1b1b",
+  scale : {
+      mode: Phaser.Scale.FIT,
+      width: 800,
+      height: 600
+  },
   parent: "game-container",
-  scene: [SplashScene, CoursesScene, CoursePracticeScene, ChordsScene, SongsScene, SongsPracticeScene, StatsScene],
+  scene: [MenuScene, CoursesScene, CoursePracticeScene, ChordsScene, SongsScene, SongsPracticeScene, StatsScene],
   // scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH }
 };
 
-window.addEventListener("load", () => {
-  const game = new Phaser.Game(config);
-});
+const game = new Phaser.Game(config);
