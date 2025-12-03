@@ -127,7 +127,7 @@ export default class GuitarScene extends Phaser.Scene {
       const matchedNote = notesInZone.find(container => container.noteName === played);
       if (matchedNote) {
         matchedNote.hit = true;
-        if (matchedNote.circle && matchedNote.circle.setFillStyle) matchedNote.circle.setFillStyle(0x00ff00); // green for hit
+        matchedNote.circle?.setFillStyle?.(0x00ff00); // green for hit
         this.stats.success++;
         this.feedback?.setText?.(`Bravo ! Note ${played} réussie (clarité ${Math.round(clarity * 100)}%)`);
         this.time.delayedCall(400, () => matchedNote.destroy());
@@ -144,23 +144,7 @@ export default class GuitarScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    // move notes left and check if in target zone
-    for (const container of this.notesGroup.getChildren()) {
-      let speed = 0.12; // vitesse normale
-      if (container.length && container.length > 1.2) {
-        speed *= 0.5;  // les notes longues vont 2x moins vite
-      }
-      container.x -= delta * speed;
-      container.isInTargetZone = container.x > 130 && container.x < 170;
-      // If note leaves the screen and was not hit, count as missed ONCE
-      if (container.x < -40) {
-        if (!container.hit && !container.missed) {
-          container.missed = true;
-          this.stats.fail++;
-        }
-        container.destroy();
-      }
-    }
+    this.moveAndHandleNotes(delta);
 
     // Exercise timing
     if (!this.exerciseStartTime) {
@@ -186,6 +170,26 @@ export default class GuitarScene extends Phaser.Scene {
     ) {
       this.shownStatsScene = true;
       this.showStatsScene();
+    }
+  }
+
+  moveAndHandleNotes(delta) {
+    // move notes left and check if in target zone
+    for (const container of this.notesGroup.getChildren()) {
+      let speed = 0.12; // vitesse normale
+      if (container.length && container.length > 1.2) {
+        speed *= 0.5;  // les notes longues vont 2x moins vite
+      }
+      container.x -= delta * speed;
+      container.isInTargetZone = container.x > 130 && container.x < 170;
+      // If note leaves the screen and was not hit, count as missed ONCE
+      if (container.x < -40) {
+        if (!container.hit && !container.missed) {
+          container.missed = true;
+          this.stats.fail++;
+        }
+        container.destroy();
+      }
     }
   }
 

@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "chord-detector": "github:nazimboudeffa/chord-detector",
     "phaser": "^3.90.0",
     "pitchy": "^4.1.0"
   },

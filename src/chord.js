@@ -1,6 +1,5 @@
 import Phaser from "phaser";
-import { startAudio } from "./audio.js";
-import { freqToStringName } from "./scene.js";
+import { matchChord, noteNames } from "chord-detector";
 
 export default class ChordScene extends Phaser.Scene {
   constructor() {
@@ -8,92 +7,102 @@ export default class ChordScene extends Phaser.Scene {
   }
 
   create() {
-    this.chordsToPractice = ["C", "G", "D", "A", "E"];
+    this.chordsToPractice = ["C maj", "G maj", "D maj", "A maj", "E maj"];
     this.currentChordIndex = 0;
     this.showChord(this.chordsToPractice[this.currentChordIndex]);
     this.feedback = this.add.text(400, 180, "Joue l'accord demandé et il sera détecté.", { fontSize: "22px", color: "#ffff00" }).setOrigin(0.5);
     this.stats = { success: 0, fail: 0 };
     this.notesGroup = this.add.group();
-    startAudio(({ pitch, clarity }) => this.onPitch({ pitch, clarity }));
-    }
+    this.start();
+  }
 
-    showChord(chordName) {
-      // Efface l'ancien label si présent
-      if (this.chordLabel) {
-        this.chordLabel.destroy();
-        this.chordLabel = null;
+  showChord(chordName) {
+    // Efface l'ancien label si présent
+    if (this.chordLabel) {
+      this.chordLabel.destroy();
+      this.chordLabel = null;
+    }
+    // Affiche le nom de l'accord
+    this.chordLabel = this.add.text(400, 100, `Joue l'accord : ${chordName}`,
+      { fontSize: '32px', color: '#fff' }).setOrigin(0.5);
+  }
+
+  start = async () => {
+      function magFromDb(db) {
+        return Math.pow(10, db / 20);
       }
-      // Affiche le nom de l'accord
-      this.chordLabel = this.add.text(400, 100, `Joue l'accord : ${chordName}`,
-        { fontSize: '32px', color: '#fff' }).setOrigin(0.5);
-    }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioCtx = new (globalThis.AudioContext || globalThis.webkitAudioContext)();
+      const source = audioCtx.createMediaStreamSource(stream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 16384;
+      analyser.smoothingTimeConstant = 0.6;
+      source.connect(analyser);
+      const sampleRate = audioCtx.sampleRate;
+      const binCount = analyser.frequencyBinCount;
+      const freqData = new Float32Array(binCount);
 
-  onPitch({ pitch, clarity }) {
-    if (!pitch || clarity < 0.7) return;
-    const played = freqToStringName(pitch);
-    if (!played) return;
-    const now = performance.now();
-    this.currentNotes = this.currentNotes || [];
-    this.currentNotes.push({ note: played, time: now });
-    // Nettoyer le buffer (garder uniquement les notes < 200ms)
-    this.currentNotes = this.currentNotes.filter(n => now - n.time < 200);
-    const notesInWindow = this.currentNotes.map(n => n.note);
-    // Deviner l'accord probable
-    const chord = this.guessChord(notesInWindow);
-    // Vérification automatique
-    const targetChord = this.chordsToPractice[this.currentChordIndex];
-    if (chord === targetChord) {
-      this.feedback?.setText?.(`Bravo ! Accord ${chord} reconnu !`);
-      this.currentChordIndex++;
-      if (this.currentChordIndex < this.chordsToPractice.length) {
-        this.showChord(this.chordsToPractice[this.currentChordIndex]);
-        this.feedback?.setText?.("Joue l'accord demandé et il sera détecté.");
-      } else {
-        this.feedback?.setText?.("Tous les accords ont été joués !");
+      function freqForBin(binIndex) {
+        return binIndex * sampleRate / analyser.fftSize;
       }
-    } else if (chord) {
-      this.feedback?.setText?.(`Accord détecté : ${chord} (ce n'est pas le bon accord)`);
-    } else {
-      this.feedback?.setText?.(`Aucun accord reconnu. Joue l'accord demandé.`);
-    }
 
-    // --- 4. Vérification des notes dans la zone cible ---
-    const notesInZone = this.notesGroup.getChildren().filter(note => note.x > 130 && note.x < 170 && !note.hit);
-
-    if (notesInZone.length > 0) {
-        // Match note
-        const matchedNote = notesInZone.find(note => note.noteName === played);
-        if (matchedNote) {
-        matchedNote.hit = true;
-        matchedNote.setFillStyle(0x00ff00);
-        this.stats.success++;
-        this.time.delayedCall(400, () => matchedNote.destroy());
-        } else {
-        this.stats.fail++;
+      function computeChroma() {
+        analyser.getFloatFrequencyData(freqData);
+        const chroma = new Array(12).fill(0);
+        for (let i = 1; i < binCount; i++) {
+          const db = freqData[i];
+          if (db === -Infinity) continue;
+          const mag = magFromDb(db);
+          const freq = freqForBin(i);
+          if (freq < 55 || freq > 5000) continue;
+          const midi = Math.round(69 + 12 * Math.log2(freq / 440));
+          if (!Number.isFinite(midi)) continue;
+          const pitchClass = ((midi % 12) + 12) % 12;
+          chroma[pitchClass] += mag;
         }
-    } else {
-        this.stats.fail++;
-    }
-    }
+        const max = Math.max(...chroma);
+        if (max > 0) for (let i=0;i<12;i++) chroma[i] /= max;
+        return chroma;
+      }
 
-    // --- Fonction de devinette d'accord simple (majeurs)
-    guessChord(notes) {
-    const chords = {
-        "C": ["C", "E", "G"],
-        "D": ["D", "F#", "A"],
-        "E": ["E", "G#", "B"],
-        "F": ["F", "A", "C"],
-        "G": ["G", "B", "D"],
-        "A": ["A", "C#", "E"],
-        "B": ["B", "D#", "F#"]
-    };
+      let lastChord = {root: null, type: null, score:0};
+      let stableCount = 0;
 
-    for (const chordName in chords) {
-        const chordNotes = chords[chordName];
-        const matchCount = notes.filter(n => chordNotes.includes(n)).length;
-        if (matchCount >= 2) return chordName; // au moins 2 notes correspondent
+      const loop = () => {
+        const chroma = computeChroma();
+        const best = matchChord(chroma);
+        const expectedChord = this.chordsToPractice[this.currentChordIndex];
+        let feedbackText = '';
+        if (best.root === null) {
+          feedbackText = '—';
+        } else {
+          const playedChord = `${noteNames[best.root]}${best.type ? ' ' + best.type : ''}`.trim();
+          feedbackText = `${playedChord} (score: ${best.score.toFixed(2)})`;
+          // Check if played chord matches expected chord (case-insensitive, ignore type for now)
+          if (
+            playedChord.replaceAll(' ', '').toLowerCase() === expectedChord.replaceAll(' ', '').toLowerCase()
+          ) {
+            feedbackText = `Bravo !\n${playedChord}`;
+          }
+        }
+        if (this.feedback) {
+          this.feedback.setText(feedbackText);
+        }
+        const SCORE_THRESHOLD = 0.35;
+        if (best.score > SCORE_THRESHOLD) {
+          if (lastChord.root === best.root && lastChord.type === best.type) {
+            stableCount++;
+          } else {
+            stableCount = 1;
+          }
+          if (stableCount >= 3) {
+            lastChord = { ...best };
+          }
+        } else {
+          stableCount = 0;
+        }
+        requestAnimationFrame(loop);
+      };
+      loop();
     }
-    return null;
-    }
-
-}
+  }
