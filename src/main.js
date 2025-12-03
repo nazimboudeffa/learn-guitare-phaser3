@@ -9,11 +9,10 @@ import ChordsScene from "./chords.js";
 
 const config = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
   backgroundColor: "#1b1b1b",
   scale : {
       mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
       width: 800,
       height: 600
   },
