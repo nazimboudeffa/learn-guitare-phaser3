@@ -7,6 +7,13 @@ export default class ChordsScene extends Phaser.Scene {
   }
 
   create() {
+    // Back to menu button
+    const backBtn = this.add.text(30, 30, '← Menu', {
+      fontSize: '22px', color: '#fff', backgroundColor: '#00bfff', padding: { left: 10, right: 10, top: 4, bottom: 4 }
+    }).setOrigin(0, 0).setInteractive({ useHandCursor: true });
+    backBtn.on('pointerdown', () => {
+      this.scene.start('MenuScene');
+    });
     this.chordsToPractice = ["C maj", "G maj", "D maj", "A maj", "E maj"];
     this.currentChordIndex = 0;
     this.showChord(this.chordsToPractice[this.currentChordIndex]);

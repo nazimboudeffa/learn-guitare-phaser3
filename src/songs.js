@@ -11,6 +11,13 @@ export default class SongsScene extends Phaser.Scene {
   }
 
   create() {
+        // Back to menu button
+        const backBtn = this.add.text(30, 30, '← Menu', {
+          fontSize: '22px', color: '#fff', backgroundColor: '#00bfff', padding: { left: 10, right: 10, top: 4, bottom: 4 }
+        }).setOrigin(0, 0).setInteractive({ useHandCursor: true });
+        backBtn.on('pointerdown', () => {
+          this.scene.start('MenuScene');
+        });
     
     this.add.text(400, 80, "Guitar Learner", { fontSize: "32px", color: "#fff" }).setOrigin(0.5);
     this.add.text(400, 140, "Choisis un exercice :", { fontSize: "20px", color: "#fff" }).setOrigin(0.5);

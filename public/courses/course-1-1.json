@@ -1,6 +1,8 @@
 {
-  "title": "Exercice 2 - Répétition de Mi grave",
+  "id": "course-1-1",
+  "title": "Répétition de Mi grave",
   "description": "Joue la corde de Mi grave (E) plusieurs fois de suite.",
+  "level": "beginner",
   "notes": [
     { "string": "E", "time": 0 },
     { "string": "E", "time": 1.2 },

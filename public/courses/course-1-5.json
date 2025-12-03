@@ -1,0 +1,16 @@
+{
+  "id": "course-1-5",
+  "title": "Rythme pop en La (notes et frets)",
+  "description": "Joue la note A sur la 2e case en rythme pop sur 8 temps.",
+  "level": "beginner",
+  "notes": [
+    { "string": "A", "fret": 2, "time": 0 },
+    { "string": "A", "fret": 2, "time": 1 },
+    { "string": "A", "fret": 2, "time": 2 },
+    { "string": "A", "fret": 2, "time": 3 },
+    { "string": "A", "fret": 2, "time": 4 },
+    { "string": "A", "fret": 2, "time": 5 },
+    { "string": "A", "fret": 2, "time": 6 },
+    { "string": "A", "fret": 2, "time": 7 }
+  ]
+}

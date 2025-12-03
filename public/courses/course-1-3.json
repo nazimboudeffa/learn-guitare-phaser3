@@ -1,6 +1,8 @@
 {
-  "title": "Exercice frettes simples",
+  "id": "course-1-3",
+  "title": "Frettes simples",
   "description": "Joue les notes sur les frettes indiquées.",
+  "level": "beginner",
   "notes": [
     { "string": "E", "fret": 0, "time": 0 },
     { "string": "E", "fret": 3, "time": 2 },

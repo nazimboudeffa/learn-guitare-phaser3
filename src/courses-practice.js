@@ -37,12 +37,36 @@ export default class CoursesPracticeScene extends Phaser.Scene {
 
   preload() {
     // Get exercise key from menu (default to ex1)
-    const exerciseKey = (this.scene.settings.data && this.scene.settings.data.exerciseKey) || 'ex1';
-    this.exerciseKey = exerciseKey;
-    this.load.json(this.exerciseKey, `exercises/${exerciseKey}.json`);
+    const courseKey = (this.scene.settings.data && this.scene.settings.data.courseKey) || 'course-1-1';
+    this.courseKey = courseKey;
+    this.load.json(this.courseKey, `courses/${courseKey}.json`);
   }
 
   create() {
+      // Index for note spawning
+      this.courseIndex = 0;
+    // Back to menu button - modern style
+    const backBtn = this.add.text(32, 32, '← Menu', {
+      fontSize: '26px', color: '#fff', backgroundColor: '#00bfff', padding: { left: 18, right: 18, top: 8, bottom: 8 }, fontStyle: 'bold', borderRadius: 12, shadow: { offsetX: 2, offsetY: 2, color: '#222', blur: 4, fill: true }
+    }).setOrigin(0, 0).setInteractive({ useHandCursor: true });
+    backBtn.on('pointerdown', () => {
+      this.scene.start('MenuScene');
+    });
+
+    // Background gradient
+    const bg = this.add.graphics();
+    bg.fillGradientStyle(0x2d7c45, 0x00bfff, 0x32cd32, 0x222222, 1);
+    bg.fillRect(0, 0, this.sys.game.config.width, this.sys.game.config.height);
+    bg.setDepth(-1);
+
+    // Title with drop shadow
+    this.add.text(450, 60, this.course?.title || "Course", {
+      fontSize: "38px", color: "#fff", fontStyle: "bold", shadow: { offsetX: 0, offsetY: 4, color: '#00bfff', blur: 12, fill: true }, wordWrap: { width: 700 }
+    }).setOrigin(0.5);
+    this.add.text(450, 110, this.course?.description || "", {
+      fontSize: "22px", color: "#ffd700", fontStyle: "italic", shadow: { offsetX: 0, offsetY: 2, color: '#222', blur: 6, fill: true }, wordWrap: { width: 700 }
+    }).setOrigin(0.5);
+
     // Layout
     this.targetY = [420, 360, 300, 240, 180, 120];
     this.noteTypes = [
@@ -54,23 +78,18 @@ export default class CoursesPracticeScene extends Phaser.Scene {
       { name: "e", color: 0xffffff }
     ];
 
-    // Load exercise data
-    this.exercise = this.cache.json.get(this.exerciseKey);
-    this.exerciseNotes = this.exercise.notes || [];
-    this.exerciseIndex = 0;
-    this.exerciseStartTime = null;
-    // Detect if exercise uses frets
-    this.usesFrets = this.exerciseNotes.some(n => typeof n.fret === 'number');
-
-    // draw lines + labels
+    // draw lines + labels with animated highlight
     for (let i = 0; i < 6; i++) {
-      this.add.line(0, 0, 0, this.targetY[i], 900, this.targetY[i], 0xffffff, 0.08).setLineWidth(4);
-      this.add.text(40, this.targetY[i], this.noteTypes[i].name, { fontSize: "20px", color: "#fff" }).setOrigin(0.5);
+      const line = this.add.line(0, 0, 0, this.targetY[i], 900, this.targetY[i], 0xffffff, 0.10).setLineWidth(6);
+      line.setAlpha(0.5);
+      this.tweens.add({ targets: line, alpha: 1, duration: 1200, yoyo: true, repeat: -1, delay: i * 120 });
+      this.add.text(60, this.targetY[i], this.noteTypes[i].name, { fontSize: "24px", color: Phaser.Display.Color.IntegerToColor(this.noteTypes[i].color).rgba, fontStyle: "bold", shadow: { offsetX: 0, offsetY: 2, color: '#222', blur: 4, fill: true } }).setOrigin(0.5);
     }
 
-    // target area rectangle (where player should play)
-    this.add.rectangle(150, 300, 40, 360, 0xffffff, 0.06).setOrigin(0.5);
-    this.add.text(150, 80, "Joue ici", { fontSize: "18px", color: "#fff" }).setOrigin(0.5);
+    // target area rectangle (where player should play) - rounded, glowing
+    const targetRect = this.add.rectangle(150, 300, 48, 360, 0xffffff, 0.1).setOrigin(0.5);
+    targetRect.setStrokeStyle(4, 0x00bfff, 0.8);
+    this.tweens.add({ targets: targetRect, alpha: 0.25, duration: 800, yoyo: true, repeat: -1 });
 
     // notes group
     this.notesGroup = this.add.group();
@@ -80,9 +99,13 @@ export default class CoursesPracticeScene extends Phaser.Scene {
 
     this.currentTargetNote = null;
 
+    // Load exercise data
+    this.course = this.cache.json.get(this.courseKey) || {};
+    this.courseNotes = Array.isArray(this.course.notes) ? this.course.notes : [];
+
     // Stats tracking
     this.stats = {
-      total: this.exerciseNotes.length,
+      total: this.courseNotes.length,
       success: 0,
       fail: 0
     };
@@ -154,17 +177,17 @@ export default class CoursesPracticeScene extends Phaser.Scene {
 
     // Spawn notes according to exercise sequence
     while (
-      this.exerciseIndex < this.exerciseNotes.length &&
-      elapsed >= this.exerciseNotes[this.exerciseIndex].time
+      this.courseIndex < this.courseNotes.length &&
+      elapsed >= this.courseNotes[this.courseIndex].time
     ) {
-      const noteObj = this.exerciseNotes[this.exerciseIndex];
+      const noteObj = this.courseNotes[this.courseIndex];
       this.spawnNote(noteObj.string, noteObj.fret, noteObj.length ?? 1);
-      this.exerciseIndex++;
+      this.courseIndex++;
     }
 
     // Show stats scene when exercise is finished
     if (
-      this.exerciseIndex >= this.exerciseNotes.length &&
+      this.courseIndex >= this.courseNotes.length &&
       this.notesGroup.getLength() === 0 &&
       !this.shownStatsScene
     ) {
@@ -206,8 +229,8 @@ export default class CoursesPracticeScene extends Phaser.Scene {
         accuracy
       },
       exercise: {
-        title: this.exercise.title,
-        description: this.exercise.description
+        title: this.course.title,
+        description: this.course.description
       }
     });
   }

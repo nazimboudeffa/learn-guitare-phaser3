@@ -37,12 +37,19 @@ export default class SongsPracticeScene extends Phaser.Scene {
 
   preload() {
     // Get exercise key from menu (default to ex1)
-    const exerciseKey = (this.scene.settings.data && this.scene.settings.data.exerciseKey) || 'ex1';
-    this.exerciseKey = exerciseKey;
-    this.load.json(this.exerciseKey, `exercises/${exerciseKey}.json`);
+    const courseKey = (this.scene.settings.data && this.scene.settings.data.courseKey) || 'course-1-1';
+    this.courseKey = courseKey;
+    this.load.json(this.courseKey, `courses/${courseKey}.json`);
   }
 
   create() {
+        // Back to menu button
+        const backBtn = this.add.text(30, 30, '← Menu', {
+          fontSize: '22px', color: '#fff', backgroundColor: '#00bfff', padding: { left: 10, right: 10, top: 4, bottom: 4 }
+        }).setOrigin(0, 0).setInteractive({ useHandCursor: true });
+        backBtn.on('pointerdown', () => {
+          this.scene.start('MenuScene');
+        });
     // Layout
     this.targetY = [420, 360, 300, 240, 180, 120];
     this.noteTypes = [
@@ -55,13 +62,12 @@ export default class SongsPracticeScene extends Phaser.Scene {
     ];
 
     // Load exercise data
-    this.exercise = this.cache.json.get(this.exerciseKey);
-    this.exerciseNotes = this.exercise.notes || [];
-    this.exerciseIndex = 0;
-    this.exerciseStartTime = null;
+    this.course = this.cache.json.get(this.courseKey);
+    this.courseNotes = this.course.notes || [];
+    this.courseIndex = 0;
+    this.courseStartTime = null;
     // Detect if exercise uses frets
-    this.usesFrets = this.exerciseNotes.some(n => typeof n.fret === 'number');
-
+    this.usesFrets = this.courseNotes.some(n => typeof n.fret === 'number');
     // draw lines + labels
     for (let i = 0; i < 6; i++) {
       this.add.line(0, 0, 0, this.targetY[i], 900, this.targetY[i], 0xffffff, 0.08).setLineWidth(4);
@@ -76,13 +82,13 @@ export default class SongsPracticeScene extends Phaser.Scene {
     this.notesGroup = this.add.group();
 
     // spawn control
-    this.exerciseStartTime = null;
+    this.courseStartTime = null;
 
     this.currentTargetNote = null;
 
     // Stats tracking
     this.stats = {
-      total: this.exerciseNotes.length,
+      total: this.courseNotes.length,
       success: 0,
       fail: 0
     };
@@ -147,24 +153,24 @@ export default class SongsPracticeScene extends Phaser.Scene {
     this.moveAndHandleNotes(delta);
 
     // Exercise timing
-    if (!this.exerciseStartTime) {
-      this.exerciseStartTime = time;
+    if (!this.courseStartTime) {
+      this.courseStartTime = time;
     }
-    const elapsed = (time - this.exerciseStartTime) / 1000;
+    const elapsed = (time - this.courseStartTime) / 1000;
 
     // Spawn notes according to exercise sequence
     while (
-      this.exerciseIndex < this.exerciseNotes.length &&
-      elapsed >= this.exerciseNotes[this.exerciseIndex].time
+      this.courseIndex < this.courseNotes.length &&
+      elapsed >= this.courseNotes[this.courseIndex].time
     ) {
-      const noteObj = this.exerciseNotes[this.exerciseIndex];
+      const noteObj = this.courseNotes[this.courseIndex];
       this.spawnNote(noteObj.string, noteObj.fret, noteObj.length ?? 1);
-      this.exerciseIndex++;
+      this.courseIndex++;
     }
 
     // Show stats scene when exercise is finished
     if (
-      this.exerciseIndex >= this.exerciseNotes.length &&
+      this.courseIndex >= this.courseNotes.length &&
       this.notesGroup.getLength() === 0 &&
       !this.shownStatsScene
     ) {
@@ -205,9 +211,9 @@ export default class SongsPracticeScene extends Phaser.Scene {
         fail: this.stats.fail,
         accuracy
       },
-      exercise: {
-        title: this.exercise.title,
-        description: this.exercise.description
+      course: {
+        title: this.course.title,
+        description: this.course.description
       }
     });
   }

@@ -1,0 +1,14 @@
+{
+  "id": "course-1-4",
+  "title": "Enchaînement C-G-D (notes et frets)",
+  "description": "Joue la séquence C (3e case), G (3e case), D (2e case) avec le bon timing.",
+  "level": "beginner",
+  "notes": [
+    { "string": "C", "fret": 3, "time": 0 },
+    { "string": "G", "fret": 3, "time": 2 },
+    { "string": "D", "fret": 2, "time": 4 },
+    { "string": "C", "fret": 3, "time": 6 },
+    { "string": "G", "fret": 3, "time": 8 },
+    { "string": "D", "fret": 2, "time": 10 }
+  ]
+}

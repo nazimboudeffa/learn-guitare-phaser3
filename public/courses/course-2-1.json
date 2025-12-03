@@ -1,6 +1,8 @@
 {
-  "title": "Exercice 1 - Gamme de Mi",
+  "id": "course-2-1",
+  "title": "Gamme de Mi",
   "description": "Joue la gamme de Mi sur chaque corde ouverte.",
+  "level": "beginner",
   "notes": [
     { "string": "E", "time": 0 },
     { "string": "A", "time": 1.6 },
